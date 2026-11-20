@@ -1,0 +1,29 @@
+{
+  "archive": "C:\\Users\\은준현\\Documents\\Codex\\2026-11-17\\1-done-service-end-serviceendagent-program-2\\outputs\\꿈플-온라인업데이트-배포.zip",
+  "files": 19,
+  "size": 65667,
+  "sha256": "5bfc7bc82dcf4eb8dd3b068cbec897612970bf99dd3db09de7309a8cf430be81",
+  "privateKeyIncluded": false,
+  "zipRoundtripVerified": true,
+  "publication": "published_and_verified",
+  "checksums": {
+    "Kkumple.Updater.exe": "4ed45170ef070c174aa0f122a108e0957a7382379f8b9c0432ebfedd4882f42e",
+    "updater-config.json": "a1d20aa958bb2fa55010a54e80b9d9daca839f5a7636267c75ddde26ff75f29f",
+    "검증결과.md": "0ae7a985a3b99230b4f4e2a58681e6e18c2d2554e9e6db9e2244af1c59ab265f",
+    "사용방법.md": "b3ee3687e658592235be4e4350a6a80b8275387f81aa225805fe9ecafeeda20d",
+    "서비스종료점검기/agent-common.ps1": "435cd4e24fcf56670ecf4f6bc5ae4e3909ec0253163d5e45c1d4b20ee65cf945",
+    "서비스종료점검기/config.json": "241b24914e6ef5390ac0e3f12b2d65ff7b0fc07d3f54659545b7b31310845688",
+    "서비스종료점검기/consent-config.json": "d637076ab5012b52d96275cf5593b2c91b67b150bebdea8d6f9c1bc64be0d946",
+    "서비스종료점검기/install-agent.ps1": "60ec2a8456a7d4e3cb0fd3ca23911010f5541ff99fe93126ebfd716c9a9a6649",
+    "서비스종료점검기/remove-agent.ps1": "076ed6fa2a5f8d218f0d0b08e74912ffc3907871aee7da5e39756fad1d5f8619",
+    "서비스종료점검기/SHA256SUMS.txt": "5bb4d94682787ab440cf67551b8b0ed99e2b1e1088af0f115d141a3fad4fa46f",
+    "서비스종료점검기/검증결과.md": "66e6285fcd518d1b04144dd890c9413dc437e8c353b7db12665c6d9819b6cb2e",
+    "서비스종료점검기/꿈플-서비스종료.exe": "d160dd085818782a6139a5ec2d7c2d4e617b0a9367e11be9a5605abc0813b886",
+    "서비스종료점검기/꿈플-설치.exe": "d0c2567448448e91fa8443b7ddf2a37cd04e04bac0c53327a412cdc57116d180",
+    "서비스종료점검기/사용방법.md": "9364ed3b4a507a6154e24d2277420915a352b49e974e3c5cda1d6a51ccd8093d",
+    "서비스종료점검기/자동점검-설치.cmd": "65fe45ed061781f62a4124ac4c487266d46aa0f53946cf9cb2cd59d8540dbcf9",
+    "서비스종료점검기/자동점검-제거.cmd": "ddb316d381dbe776b5259e5599067d6e6215a3237d7fc455d08e34969753e2f1",
+    "자동업데이트-설치.cmd": "4ac77d447ef2ce58fd11dc55fc93124dac072de7a818463878c6651fe971cfea",
+    "자동업데이트-제거.cmd": "b2afe8a5dcafa9c919ea368cbb889918157863417864014eb1164c24c5a0d4d5"
+  }
+}
