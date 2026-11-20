@@ -1,0 +1,86 @@
+(vl-load-com)
+
+(defun kkf:load-mpl-forms (/ module result)
+  (if (and (= (substr (getvar "ACADVER") 1 4) "20.0")
+           (setq module
+             (findfile
+               (strcat (getenv "APPDATA")
+                 "\\Autodesk\\ApplicationPlugins\\KkumpleFree.bundle\\Contents\\Versions\\2015\\Kkumple.MplForms.dll")))
+           (not (equal (vl-bb-ref 'kkumple-mpl-forms-loaded) module)))
+    (progn
+      (setq result (vl-catch-all-apply 'vl-cmdf (list "_.NETLOAD" module)))
+      (if (vl-catch-all-error-p result)
+        (princ (strcat "\n[Kkumple MPL] " (vl-catch-all-error-message result)))
+        (vl-bb-set 'kkumple-mpl-forms-loaded module))))
+  (princ))
+
+;; A menu can be loaded during MENULOAD. Run NETLOAD after that command ends.
+(defun kkf:queue-mpl-forms (/ doc)
+  (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
+  (if (vlax-method-applicable-p doc 'PostCommand)
+    (vla-PostCommand doc "(kkf:load-mpl-forms)\n")))
+(defun-q kkf:mpl-forms-startup () (vl-catch-all-apply 'kkf:queue-mpl-forms nil))
+(if (not (boundp '*kkf-mpl-startup-added*))
+  (progn
+    (setq S::STARTUP (append S::STARTUP kkf:mpl-forms-startup))
+    (setq *kkf-mpl-startup-added* T)))
+(vl-catch-all-apply 'kkf:queue-mpl-forms nil)
+(princ)
+
+(defun kkf:activate-bundled-updater (/ family appdata next)
+  (setq family "2015" appdata (getenv "APPDATA"))
+  (if (and appdata
+           (not (vl-bb-ref 'kkumple-updater-activation-started))
+           (setq next (findfile
+             (strcat appdata "\\Autodesk\\ApplicationPlugins\\KkumpleFree.bundle\\Contents\\Versions\\"
+                     family "\\Kkumple.Updater.Next.exe")))
+           (startapp (strcat (chr 34) next (chr 34)) "--activate-bundled"))
+    (vl-bb-set 'kkumple-updater-activation-started T))
+  (princ))
+
+(vl-catch-all-apply 'kkf:activate-bundled-updater nil)
+(princ)
+
+;; 2.0.7: restore the per-user Support folder (acad.pgp location) when it is missing from the support path.
+;; Without it, command aliases such as L, CO and TR are reported as unknown commands.
+(defun kkf:split-paths (s / i out)
+  (while (setq i (vl-string-search ";" s)) (setq out (cons (substr s 1 i) out) s (substr s (+ i 2))))
+  (reverse (cons s out)))
+(defun kkf:path-listed-p (dir paths / key found)
+  (setq key (strcase (vl-string-right-trim "\\/ " dir)))
+  (foreach p (kkf:split-paths paths)
+    (if (equal (strcase (vl-string-right-trim "\\/ " (vl-string-left-trim " " p))) key) (setq found T)))
+  found)
+(defun kkf:repair-support-path (/ roam sup files cur)
+  (if (not (vl-bb-ref 'kkumple-support-path-checked))
+    (progn
+      (vl-bb-set 'kkumple-support-path-checked T)
+      (setq roam (getvar "ROAMABLEROOTPREFIX"))
+      (if (and (eq (type roam) 'STR) (/= roam ""))
+        (progn
+          (setq sup (strcat (vl-string-right-trim "\\" roam) "\\Support"))
+          (setq files (vla-get-Files (vla-get-Preferences (vlax-get-acad-object))))
+          (setq cur (vla-get-SupportPath files))
+          (if (and (vl-file-directory-p sup) (eq (type cur) 'STR) (not (kkf:path-listed-p sup cur)))
+            (progn
+              (vla-put-SupportPath files (if (= cur "") sup (strcat sup ";" cur)))
+              (setvar "RE-INIT" 16)
+              (princ "\n[Kkumple] Restored the user Support folder to the support path and reloaded command aliases (acad.pgp).")))))))
+  (princ))
+(vl-load-com)
+(vl-catch-all-apply 'kkf:repair-support-path nil)
+(princ)
+
+;; 2.0.8: refresh the user's downloaded Kkumple installer in the background when CAD starts (no window; does not delay CAD).
+(defun kkf:refresh-installer (/ appdata setup)
+  (setq appdata (getenv "APPDATA"))
+  (if (and appdata
+           (not (vl-bb-ref 'kkumple-installer-refresh-started))
+           (setq setup (findfile
+             (strcat appdata "\\Autodesk\\ApplicationPlugins\\KkumpleFree.bundle\\Contents\\Versions\\2015\\Kkumple.Setup.exe"))))
+    (progn
+      (vl-bb-set 'kkumple-installer-refresh-started T)
+      (startapp (strcat (chr 34) setup (chr 34)) "--refresh-installer")))
+  (princ))
+(vl-catch-all-apply 'kkf:refresh-installer nil)
+(princ)
