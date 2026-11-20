@@ -1,0 +1,77 @@
+(vl-load-com)
+;; 2.0.9: never load or run a file directly from Contents\Versions. A running/loaded file there locks the folder
+;; and blocks the next automatic update. Copy it to %LOCALAPPDATA%\Kkumple\Shadow\<kind>\<size-time>\ and use the copy.
+(defun kkf:mkdirs (path / i)
+  (setq i 2)
+  (while (setq i (vl-string-search "\\" path (1+ i)))
+    (if (not (vl-file-directory-p (substr path 1 i))) (vl-mkdir (substr path 1 i))))
+  (if (not (vl-file-directory-p path)) (vl-mkdir path))
+  (vl-file-directory-p path))
+(defun kkf:shadow-copy (src kind / local key dir dst)
+  (setq local (getenv "LOCALAPPDATA"))
+  (if (and local src (findfile src))
+    (progn
+      (setq key (strcat (itoa (vl-file-size src)) "-" (apply 'strcat (mapcar 'itoa (vl-file-systime src)))))
+      (setq dir (strcat local "\\Kkumple\\Shadow\\" kind "\\" key))
+      (setq dst (strcat dir "\\" (vl-filename-base src) (vl-filename-extension src)))
+      (if (and (not (findfile dst)) (kkf:mkdirs dir)) (vl-file-copy src dst))
+      (findfile dst))))
+
+
+(defun kkf:activate-bundled-updater (/ family appdata next)
+  (setq family "2025" appdata (getenv "APPDATA"))
+  (if (and appdata
+           (not (vl-bb-ref 'kkumple-updater-activation-started))
+           (setq next (findfile
+             (strcat appdata "\\Autodesk\\ApplicationPlugins\\KkumpleFree.bundle\\Contents\\Versions\\"
+                     family "\\Kkumple.Updater.Next.exe")))
+           (startapp (strcat (chr 34) next (chr 34)) "--activate-bundled"))
+    (vl-bb-set 'kkumple-updater-activation-started T))
+  (princ))
+
+(vl-catch-all-apply 'kkf:activate-bundled-updater nil)
+(princ)
+
+;; 2.0.7: restore the per-user Support folder (acad.pgp location) when it is missing from the support path.
+;; Without it, command aliases such as L, CO and TR are reported as unknown commands.
+(defun kkf:split-paths (s / i out)
+  (while (setq i (vl-string-search ";" s)) (setq out (cons (substr s 1 i) out) s (substr s (+ i 2))))
+  (reverse (cons s out)))
+(defun kkf:path-listed-p (dir paths / key found)
+  (setq key (strcase (vl-string-right-trim "\\/ " dir)))
+  (foreach p (kkf:split-paths paths)
+    (if (equal (strcase (vl-string-right-trim "\\/ " (vl-string-left-trim " " p))) key) (setq found T)))
+  found)
+(defun kkf:repair-support-path (/ roam sup files cur)
+  (if (not (vl-bb-ref 'kkumple-support-path-checked))
+    (progn
+      (vl-bb-set 'kkumple-support-path-checked T)
+      (setq roam (getvar "ROAMABLEROOTPREFIX"))
+      (if (and (eq (type roam) 'STR) (/= roam ""))
+        (progn
+          (setq sup (strcat (vl-string-right-trim "\\" roam) "\\Support"))
+          (setq files (vla-get-Files (vla-get-Preferences (vlax-get-acad-object))))
+          (setq cur (vla-get-SupportPath files))
+          (if (and (vl-file-directory-p sup) (eq (type cur) 'STR) (not (kkf:path-listed-p sup cur)))
+            (progn
+              (vla-put-SupportPath files (if (= cur "") sup (strcat sup ";" cur)))
+              (setvar "RE-INIT" 16)
+              (princ "\n[Kkumple] Restored the user Support folder to the support path and reloaded command aliases (acad.pgp).")))))))
+  (princ))
+(vl-load-com)
+(vl-catch-all-apply 'kkf:repair-support-path nil)
+(princ)
+
+;; 2.0.8: refresh the user's downloaded Kkumple installer in the background when CAD starts (no window; does not delay CAD).
+(defun kkf:refresh-installer (/ appdata setup)
+  (setq appdata (getenv "APPDATA"))
+  (if (and appdata
+           (not (vl-bb-ref 'kkumple-installer-refresh-started))
+           (setq setup (kkf:shadow-copy
+             (strcat appdata "\\Autodesk\\ApplicationPlugins\\KkumpleFree.bundle\\Contents\\Versions\\2025\\Kkumple.Setup.exe") "Setup")))
+    (progn
+      (vl-bb-set 'kkumple-installer-refresh-started T)
+      (startapp (strcat (chr 34) setup (chr 34)) "--refresh-installer")))
+  (princ))
+(vl-catch-all-apply 'kkf:refresh-installer nil)
+(princ)
