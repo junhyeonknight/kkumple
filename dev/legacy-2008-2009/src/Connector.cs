@@ -19,8 +19,8 @@ using Microsoft.Win32;
 
 [assembly: AssemblyTitle("꿈플 2008-2009 연결기 (시험판)")]
 [assembly: AssemblyProduct("꿈플")]
-[assembly: AssemblyVersion("0.1.0.0")]
-[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: AssemblyVersion("0.2.0.0")]
+[assembly: AssemblyFileVersion("0.2.0.0")]
 
 namespace Kkumple.Legacy17
 {
@@ -125,6 +125,7 @@ namespace Kkumple.Legacy17
                 Directory.Move(stage, data);
                 // 로더는 최종 폴더가 생긴 뒤 만든다(ASCII 짧은 경로를 쓸 수 있도록).
                 File.WriteAllBytes(Path.Combine(data, LoaderName), BuildLoader(data, data));
+                CopyReporter(data);
                 if (Directory.Exists(backup)) TryDelete(backup);
             }
             catch
@@ -273,6 +274,7 @@ namespace Kkumple.Legacy17
             }
             string root = LoaderPathForCad(data, true);
             string text = tmpl.Replace("@@ROOT@@", root.Replace("\\", "\\\\"))
+                              .Replace("@@REPORTER@@", ReporterName)
                               .Replace("@@COMMANDS@@", string.Join(" ", commands.Select(c => "\"" + c + "\"").ToArray()))
                               .Replace("@@ALIASES@@", aliases.ToString().TrimEnd());
             if (text.Contains("@@")) throw new InvalidDataException("로더 템플릿 치환이 끝나지 않았습니다.");
@@ -295,6 +297,17 @@ namespace Kkumple.Legacy17
 
         static bool IsAscii(string s) { return s.All(c => c < 128); }
 
+        public const string ReporterName = "kkumple-legacy17-report.exe";
+        public static string ShortPath(string p) { return Short(p); }
+
+        // CAD 안의 로더가 진단 보고서를 보낼 때 실행할 연결기 사본
+        static void CopyReporter(string data)
+        {
+            string self = Assembly.GetExecutingAssembly().Location;
+            File.Copy(self, Path.Combine(data, ReporterName), true);
+            if (File.Exists(self + ".config")) File.Copy(self + ".config", Path.Combine(data, ReporterName + ".config"), true);
+        }
+
         [DllImport("kernel32", CharSet = CharSet.Unicode)] static extern int GetShortPathName(string l, StringBuilder s, int n);
         [DllImport("kernel32", CharSet = CharSet.Unicode)] static extern int GetLongPathName(string s, StringBuilder l, int n);
         static string Short(string p) { var sb = new StringBuilder(1024); return Directory.Exists(p) && GetShortPathName(p, sb, sb.Capacity) > 0 ? sb.ToString() : p; }
@@ -312,11 +325,13 @@ namespace Kkumple.Legacy17
         readonly Button install = new Button { Text = "꿈플 연결(설치)", AutoSize = true };
         readonly Button remove = new Button { Text = "이 컴퓨터에서 제거", AutoSize = true };
         readonly Button close = new Button { Text = "닫기", AutoSize = true };
+        readonly Button send = new Button { Text = "진단 보내기", AutoSize = true };
+        readonly Button runCad = new Button { Text = "CAD 실행 후 진단", AutoSize = true };
 
         public MainForm(Options o)
         {
             opt = o;
-            Text = "꿈플 AutoCAD 2008/2009 연결기 (시험판 0.1)";
+            Text = "꿈플 AutoCAD 2008/2009 연결기 (시험판 0.2)";
             Font = new Font("맑은 고딕", 9f);
             Size = new Size(640, 520); MinimumSize = new Size(520, 420);
             StartPosition = FormStartPosition.CenterScreen; KeyPreview = true;
@@ -325,10 +340,10 @@ namespace Kkumple.Legacy17
                 Dock = DockStyle.Fill, AutoSize = false, ForeColor = Color.DarkRed,
                 Text = "시험판입니다. 꿈플 모듈은 AutoCAD 2010용으로 만들어져 2008/2009에서 일부 기능이 동작하지 않을 수 있습니다.\r\n" +
                        "• 2009: 리본(꿈플 I·II 탭)·풀다운 메뉴·도구막대  • 2008: 리본이 없는 버전이라 풀다운 메뉴·도구막대로 표시\r\n" +
-                       "• CAD 첫 실행 후 명령행의 'Registered N of M' 문구와 KKREPORT 보고서를 확인해 전달해 주세요."
+                       "• 진단 보고서(PC·AutoCAD 정보, 오류, CAD 명령행 기록)는 개발자에게 자동으로 전송됩니다. 도면 내용은 보내지 않습니다."
             };
             var buttons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft, AutoSize = true };
-            buttons.Controls.AddRange(new Control[] { close, remove, install });
+            buttons.Controls.AddRange(new Control[] { close, remove, send, runCad, install });
             var grid = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 5, Padding = new Padding(10) };
             grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 70));
             grid.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -344,8 +359,34 @@ namespace Kkumple.Legacy17
             install.Click += (s, e) => Run(true);
             remove.Click += (s, e) => Run(false);
             close.Click += (s, e) => Close();
+            send.Click += (s, e) => SendAsync("manual", null);
+            runCad.Click += (s, e) => RunCadAndReport();
             KeyDown += (s, e) => { if (e.KeyCode == Keys.Escape) Close(); };
-            Load += (s, e) => Refresh2();
+            Load += (s, e) => { Refresh2(); SendAsync("connector-open", null); };
+        }
+
+        void SendAsync(string reason, Exception err)
+        {
+            Log("진단 보고서 보내는 중...");
+            var t = new System.Threading.Thread(() =>
+            {
+                string r = Diag.Send(opt, reason, err);
+                try { BeginInvoke(new Action(() => Log(r))); } catch { }
+            }) { IsBackground = true };
+            t.Start();
+        }
+
+        void RunCadAndReport()
+        {
+            var p = Engine.Discover(opt).FirstOrDefault(x => !string.IsNullOrEmpty(x.Location) && File.Exists(Path.Combine(x.Location, "acad.exe")));
+            if (p == null) { Log("실행할 AutoCAD 2008/2009(acad.exe)를 찾지 못했습니다. 진단 보고서만 보냅니다."); SendAsync("cad-not-found", null); return; }
+            string exe = Path.Combine(p.Location, "acad.exe");
+            Log("AutoCAD 실행: " + exe + " — 90초 뒤 진단 보고서를 보냅니다. CAD가 뜨면 명령행에 KKLOAD도 한 번 입력해 주세요.");
+            try { Process.Start(new ProcessStartInfo(exe) { WorkingDirectory = p.Location, UseShellExecute = true }); }
+            catch (Exception ex) { Log("AutoCAD 실행 실패: " + ex.Message); SendAsync("cad-start-fail", ex); return; }
+            var timer = new Timer { Interval = 90000 };
+            timer.Tick += (s, e) => { timer.Stop(); timer.Dispose(); SendAsync("cad-run-90s", null); };
+            timer.Start();
         }
 
         void Refresh2()
@@ -356,7 +397,7 @@ namespace Kkumple.Legacy17
             install.Enabled = list.Items.Count > 0;
         }
 
-        void Log(string s) { logBox.AppendText(s + Environment.NewLine); }
+        void Log(string s) { Diag.Note(s); logBox.AppendText(s + Environment.NewLine); }
 
         void Run(bool doInstall)
         {
@@ -367,15 +408,17 @@ namespace Kkumple.Legacy17
                 {
                     Engine.Install(opt, list.CheckedItems.Cast<CadProduct>().ToList(), Log);
                     Log("완료. AutoCAD 2008/2009를 실행하면 꿈플을 불러옵니다.");
+                    SendAsync("install-ok", null);
                     MessageBox.Show(this, "연결을 마쳤습니다.\n\nAutoCAD를 실행한 뒤 명령행의 [Kkumple 2008-2009 TEST] 문구를 확인해 주세요.\n2009에서 리본 탭이 보이지 않으면 사용설명의 '리본 탭 표시' 절차를 따라 주세요.", "꿈플 시험판");
                 }
                 else
                 {
                     if (MessageBox.Show(this, "꿈플 2008/2009 시험판을 제거할까요?\n\n먼저 AutoCAD에서 KKUNLOADMENU 명령으로 메뉴를 내린 뒤 제거하면 다음 실행 때 '메뉴 파일 없음' 경고가 나오지 않습니다.\n도면과 AutoCAD 설정은 변경하지 않습니다.", "제거 확인", MessageBoxButtons.OKCancel) != DialogResult.OK) return;
                     Engine.Uninstall(opt, Log);
+                    SendAsync("uninstall-ok", null);
                 }
             }
-            catch (Exception ex) { Log("실패: " + ex.Message); MessageBox.Show(this, ex.Message, "꿈플 시험판", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { Log("실패: " + ex.Message); SendAsync(doInstall ? "install-fail" : "uninstall-fail", ex); MessageBox.Show(this, ex.Message, "꿈플 시험판", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
             finally { UseWaitCursor = false; remove.Enabled = true; install.Enabled = list.Items.Count > 0; }
         }
     }
@@ -386,11 +429,13 @@ namespace Kkumple.Legacy17
         static int Main(string[] args)
         {
             var o = new Options();
-            string mode = null, logFile = null; var products = new List<string>(); bool all = false;
+            string mode = null, logFile = null, reason = "cad"; var products = new List<string>(); bool all = false; int delay = 0;
             for (int i = 0; i < args.Length; i++)
             {
                 switch (args[i])
                 {
+                    case "--send-report": mode = args[i]; if (i + 1 < args.Length && !args[i + 1].StartsWith("--")) reason = args[++i]; break;
+                    case "--delay": int.TryParse(args[++i], out delay); break;
                     case "--list": case "--install": case "--uninstall": mode = args[i]; break;
                     case "--all": all = true; break;
                     case "--product": products.Add(args[++i]); break;
@@ -402,6 +447,16 @@ namespace Kkumple.Legacy17
                     default: MessageBox.Show("알 수 없는 옵션: " + args[i]); return 2;
                 }
             }
+            if (mode == "--send-report")
+            {
+                // CAD 안의 로더가 실행: 명령행 기록이 디스크에 써질 시간을 준 뒤 조용히 보낸다.
+                if (delay > 0) System.Threading.Thread.Sleep(Math.Min(delay, 600) * 1000);
+                Diag.Send(o, reason, null);
+                return 0;
+            }
+            AppDomain.CurrentDomain.UnhandledException += (s, e) => Diag.Send(o, "crash", e.ExceptionObject as Exception);
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            Application.ThreadException += (s, e) => { Diag.Send(o, "crash", e.Exception); MessageBox.Show("오류가 발생해 진단 보고서를 보냈습니다.\n\n" + e.Exception.Message, "꿈플 시험판"); };
             if (mode == null)
             {
                 Application.EnableVisualStyles();
@@ -418,7 +473,7 @@ namespace Kkumple.Legacy17
                 else if (mode == "--install") Engine.Install(o, found.Where(p => all || products.Contains(p.Id, StringComparer.OrdinalIgnoreCase)).ToList(), write);
                 else Engine.Uninstall(o, write);
             }
-            catch (Exception ex) { write("ERROR: " + ex.Message); code = 1; }
+            catch (Exception ex) { write("ERROR: " + ex.Message); code = 1; if (!o.TestRoots) Diag.Send(o, "cli-fail", ex); }
             if (logFile != null) File.WriteAllText(logFile, log.ToString(), new UTF8Encoding(true));
             else if (code != 0 || mode == "--list") MessageBox.Show(log.ToString(), "꿈플 시험판");
             return code;
