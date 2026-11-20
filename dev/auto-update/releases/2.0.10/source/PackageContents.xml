@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationPackage SchemaVersion="1.0" AppVersion="2.0.10" Name="꿈플" Description="무료 비상업적 CAD 보조도구" Author="꿈플 통합 / DreamPlus 원작자" ProductCode="{1A420DB5-12C1-41AC-B302-7E07B9B24894}">
+  <CompanyDetails Name="꿈플" />
+  <Components>
+    <RuntimeRequirements OS="Win64" Platform="AutoCAD" SeriesMin="R20.0" SeriesMax="R20.0" SupportPath="./Contents/Versions/2015" />
+    <ComponentEntry AppName="Kkumple_cad-a21e52e8f3c2d5847c975fe348541c1376ad3e189b166bfcc8b9483a752f3a01" ModuleName="./Contents/Loaders/kkumple-update-gate-b20fdcac9b3ad5139ce388de.lsp" AppDescription="꿈플 CAD 보조도구" PerDocument="True" LoadOnAutoCADStartup="True" LoadOnAppearance="False" />
+  </Components>
+</ApplicationPackage>
