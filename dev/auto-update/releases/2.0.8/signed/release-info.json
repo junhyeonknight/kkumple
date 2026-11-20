@@ -1,0 +1,35 @@
+{
+    "schema":  1,
+    "appId":  "KKUMPLE_FREE_NONCOMMERCIAL_V2",
+    "version":  "2.0.8",
+    "issuedAtUtc":  "2026-11-20T01:47:05.5767774+00:00",
+    "expiresAtUtc":  "2027-11-20T01:47:05.5767774+00:00",
+    "packages":  [
+                     {
+                         "family":  "2010",
+                         "url":  "https://github.com/junhyeonknight/kkumple/releases/download/bundle-v2.0.8/kkumple-2.0.8-2010.zip",
+                         "sha256":  "19da3aa01ec1c0fbe09eaadf850995b6b45d62291d0ed9a3590c408f181735aa",
+                         "bytes":  220585
+                     },
+                     {
+                         "family":  "2013",
+                         "url":  "https://github.com/junhyeonknight/kkumple/releases/download/bundle-v2.0.8/kkumple-2.0.8-2013.zip",
+                         "sha256":  "08754afbf9c9ddad6ab64fdd206b156e703fc873f124496d36d21fca441e3d05",
+                         "bytes":  220585
+                     },
+                     {
+                         "family":  "2015",
+                         "url":  "https://github.com/junhyeonknight/kkumple/releases/download/bundle-v2.0.8/kkumple-2.0.8-2015.zip",
+                         "sha256":  "b970fa606caabadca9b027478a089e3802b59a24c6332a054b244ade562c1b0c",
+                         "bytes":  225659
+                     },
+                     {
+                         "family":  "2025",
+                         "url":  "https://github.com/junhyeonknight/kkumple/releases/download/bundle-v2.0.8/kkumple-2.0.8-2025.zip",
+                         "sha256":  "e77f3cced07eb4e4c73d66614c1bdc0bda6313c720876f39ec91ec44b0380397",
+                         "bytes":  220584
+                     }
+                 ],
+    "releaseNotes":  "• CAD를 켤 때 사용자가 받아 둔 꿈플 설치 도우미도 백그라운드에서 최신으로 바뀝니다. CAD 시작은 기다리지 않습니다.\n• CAD의 \u0027꿈플 관리\u0027 화면이 설치 도우미 2.2.6으로 바뀝니다.\n• 기존 CAD 명령 별칭(L, CO, TR 등)을 바로 입력하면 \u0027알 수 없는 명령\u0027이 나오던 문제를 고쳤습니다(2.0.7).",
+    "updaterSha256":  "53700692b3829781a650ae40ac949af7a20fcd7fda7653e6de4b2377b2900b2a"
+}
