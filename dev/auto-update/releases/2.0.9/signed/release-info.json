@@ -1,0 +1,35 @@
+{
+    "schema":  1,
+    "appId":  "KKUMPLE_FREE_NONCOMMERCIAL_V2",
+    "version":  "2.0.9",
+    "issuedAtUtc":  "2026-11-20T02:54:16.1750895+00:00",
+    "expiresAtUtc":  "2027-11-20T02:54:16.1750895+00:00",
+    "packages":  [
+                     {
+                         "family":  "2010",
+                         "url":  "https://github.com/junhyeonknight/kkumple/releases/download/bundle-v2.0.9/kkumple-2.0.9-2010.zip",
+                         "sha256":  "70e4d47384dcfaecddd4429324072ee826122fc243a51639250fe5342321384d",
+                         "bytes":  221354
+                     },
+                     {
+                         "family":  "2013",
+                         "url":  "https://github.com/junhyeonknight/kkumple/releases/download/bundle-v2.0.9/kkumple-2.0.9-2013.zip",
+                         "sha256":  "aab218a48a2cb4d648078c867b4ac4cbaf7c56469fb01e094e85b64716cf709b",
+                         "bytes":  221354
+                     },
+                     {
+                         "family":  "2015",
+                         "url":  "https://github.com/junhyeonknight/kkumple/releases/download/bundle-v2.0.9/kkumple-2.0.9-2015.zip",
+                         "sha256":  "72161777b6a76e27431ab9c4943917dd4882aeaa2af58f0c1a614708a36c40db",
+                         "bytes":  226432
+                     },
+                     {
+                         "family":  "2025",
+                         "url":  "https://github.com/junhyeonknight/kkumple/releases/download/bundle-v2.0.9/kkumple-2.0.9-2025.zip",
+                         "sha256":  "1b3ac0330b6d223300dd5c179ba29972e285368c2347404686c83e5c77b9cfba",
+                         "bytes":  221353
+                     }
+                 ],
+    "releaseNotes":  "• AutoCAD 2015에서 자동 업데이트가 \"꿈플 파일을 사용 중인 다른 AutoCAD를 종료한 뒤 다시 시도해 주세요: Kkumple.MplForms.dll\"로 실패하던 문제를 고쳤습니다. CAD가 업데이트 대상 폴더의 파일을 직접 불러오지 않고 복사본을 사용합니다.\n• 실패한 업데이트가 남긴 임시 폴더를 CAD 시작 시 자동으로 정리합니다.\n• CAD를 켤 때 받아 둔 꿈플 설치 도우미도 최신으로 바뀝니다(설치 도우미 2.2.7).",
+    "updaterSha256":  "53700692b3829781a650ae40ac949af7a20fcd7fda7653e6de4b2377b2900b2a"
+}
