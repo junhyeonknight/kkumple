@@ -1,0 +1,16 @@
+const task = await taskSpace(1);
+const page = task.page("p1");
+const fs = await import("node:fs/promises");
+const next = (await fs.readFile("E:/꿈플-원격스위치/auto-update/releases/2.0.7/signed/update.json", "utf8")).replace(/^\uFEFF/, "").trim();
+const cur = await (await fetch("https://api.github.com/repos/junhyeonknight/kkumple/contents/update.json?ref=main")).json();
+const curText = Buffer.from(cur.content, "base64").toString("utf8");
+console.log({ currentVersion: JSON.parse(JSON.parse(curText).payload).version });
+const selector = '.cm-content[contenteditable="true"]';
+await page.goto("https://github.com/junhyeonknight/kkumple/edit/main/update.json", { timeout: 60000 });
+await page.waitForSelector(selector, { timeout: 30000 });
+await page.focus(selector);
+await page.keyboard.press("ControlOrMeta+a");
+await page.keyboard.insertText(next);
+await page.waitForFunction((want) => document.querySelector(".cm-content")?.innerText.trim() === want, next, { timeout: 15000 });
+console.log("editor matches signed update.json");
+console.log((await page.snapshot()).split("\n").filter((l) => /Commit changes/i.test(l)).join("\n"));

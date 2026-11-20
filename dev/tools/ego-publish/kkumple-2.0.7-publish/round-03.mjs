@@ -1,0 +1,10 @@
+const task = await taskSpace(1);
+const page = task.page("p1");
+await page.fill('input[placeholder="Search or create a new tag"]', "bundle-v2.0.7");
+await page.waitForTimeout(600);
+await page.click('text="Create new tag"', { label: "create new tag" });
+await page.waitForTimeout(1000);
+const dlg = await page.evaluate(() => [...document.querySelectorAll('[role=dialog], dialog')].map((d) => d.innerText.slice(0, 800)));
+console.log(dlg);
+const snap = await page.snapshot();
+console.log(snap.split("\n").slice(0, 60).join("\n"));

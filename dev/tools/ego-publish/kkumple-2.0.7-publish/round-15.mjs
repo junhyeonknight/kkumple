@@ -1,0 +1,24 @@
+const task = await taskSpace(1);
+const page = task.page("p1");
+const fs = await import("node:fs/promises");
+const next = (await fs.readFile("E:/꿈플-원격스위치/auto-update/releases/2.0.7/signed/update.json", "utf8")).replace(/^\uFEFF/, "").trim();
+const ok = await page.evaluate((want) => document.querySelector(".cm-content")?.innerText.trim() === want, next);
+if (!ok) throw new Error("editor content changed");
+await page.click('text="Commit changes..."', { label: "open commit dialog" });
+await page.waitForSelector("#commit-message-input", { timeout: 15000 });
+const direct = await page.evaluate(() => document.querySelector('[role=dialog] input[value=direct], dialog input[value=direct]')?.checked);
+if (!direct) throw new Error("direct commit to main not selected");
+await page.fill("#commit-message-input", "Publish signed Kkumple 2.0.7 automatic update");
+const pos = await page.evaluate(() => {
+  const b = document.querySelector(':is([role=dialog],dialog[open]) button[data-variant=primary]');
+  const r = b.getBoundingClientRect();
+  return { x: r.x + r.width / 2, y: r.y + r.height / 2, text: b.innerText.trim() };
+});
+console.log(pos.text);
+await page.mouse.click(pos.x, pos.y, { label: "commit update.json" });
+await page.waitForURL("**/blob/main/update.json", { timeout: 40000 });
+console.log({ url: await page.url() });
+await page.waitForTimeout(3000);
+const cur = await (await fetch("https://api.github.com/repos/junhyeonknight/kkumple/contents/update.json?ref=main", { cache: "no-store" })).json();
+const txt = Buffer.from(cur.content, "base64").toString("utf8").trim();
+console.log({ sameAsSigned: txt === next, version: JSON.parse(JSON.parse(txt).payload).version, sha: cur.sha });
