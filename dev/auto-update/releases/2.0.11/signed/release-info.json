@@ -1,0 +1,35 @@
+{
+    "schema":  1,
+    "appId":  "KKUMPLE_FREE_NONCOMMERCIAL_V2",
+    "version":  "2.0.11",
+    "issuedAtUtc":  "2026-11-20T06:20:06.0839283+00:00",
+    "expiresAtUtc":  "2027-11-20T06:20:06.0839283+00:00",
+    "packages":  [
+                     {
+                         "family":  "2010",
+                         "url":  "https://github.com/junhyeonknight/kkumple/releases/download/bundle-v2.0.11/kkumple-2.0.11-2010.zip",
+                         "sha256":  "70e4d47384dcfaecddd4429324072ee826122fc243a51639250fe5342321384d",
+                         "bytes":  221354
+                     },
+                     {
+                         "family":  "2013",
+                         "url":  "https://github.com/junhyeonknight/kkumple/releases/download/bundle-v2.0.11/kkumple-2.0.11-2013.zip",
+                         "sha256":  "aab218a48a2cb4d648078c867b4ac4cbaf7c56469fb01e094e85b64716cf709b",
+                         "bytes":  221354
+                     },
+                     {
+                         "family":  "2015",
+                         "url":  "https://github.com/junhyeonknight/kkumple/releases/download/bundle-v2.0.11/kkumple-2.0.11-2015.zip",
+                         "sha256":  "753446cbc36a31b6b829aeeeaa2e799f7a329c469e289ddc09f216cc71f85741",
+                         "bytes":  226857
+                     },
+                     {
+                         "family":  "2025",
+                         "url":  "https://github.com/junhyeonknight/kkumple/releases/download/bundle-v2.0.11/kkumple-2.0.11-2025.zip",
+                         "sha256":  "1b3ac0330b6d223300dd5c179ba29972e285368c2347404686c83e5c77b9cfba",
+                         "bytes":  221353
+                     }
+                 ],
+    "releaseNotes":  "• AutoCAD 2015를 켤 때 \"파일 로드 - 보안 경고\"(Kkumple.MplForms.dll)가 뜨던 문제를 고쳤습니다. 복사본을 이미 신뢰된 꿈플 폴더에 두어 경고 없이 불러옵니다.",
+    "updaterSha256":  "53700692b3829781a650ae40ac949af7a20fcd7fda7653e6de4b2377b2900b2a"
+}
