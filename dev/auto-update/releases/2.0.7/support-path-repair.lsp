@@ -1,0 +1,30 @@
+
+;; 2.0.7: restore the per-user Support folder (acad.pgp location) when it is missing from the support path.
+;; Without it, command aliases such as L, CO and TR are reported as unknown commands.
+(defun kkf:split-paths (s / i out)
+  (while (setq i (vl-string-search ";" s)) (setq out (cons (substr s 1 i) out) s (substr s (+ i 2))))
+  (reverse (cons s out)))
+(defun kkf:path-listed-p (dir paths / key found)
+  (setq key (strcase (vl-string-right-trim "\\/ " dir)))
+  (foreach p (kkf:split-paths paths)
+    (if (equal (strcase (vl-string-right-trim "\\/ " (vl-string-left-trim " " p))) key) (setq found T)))
+  found)
+(defun kkf:repair-support-path (/ roam sup files cur)
+  (if (not (vl-bb-ref 'kkumple-support-path-checked))
+    (progn
+      (vl-bb-set 'kkumple-support-path-checked T)
+      (setq roam (getvar "ROAMABLEROOTPREFIX"))
+      (if (and (eq (type roam) 'STR) (/= roam ""))
+        (progn
+          (setq sup (strcat (vl-string-right-trim "\\" roam) "\\Support"))
+          (setq files (vla-get-Files (vla-get-Preferences (vlax-get-acad-object))))
+          (setq cur (vla-get-SupportPath files))
+          (if (and (vl-file-directory-p sup) (eq (type cur) 'STR) (not (kkf:path-listed-p sup cur)))
+            (progn
+              (vla-put-SupportPath files (if (= cur "") sup (strcat sup ";" cur)))
+              (setvar "RE-INIT" 16)
+              (princ "\n[Kkumple] Restored the user Support folder to the support path and reloaded command aliases (acad.pgp).")))))))
+  (princ))
+(vl-load-com)
+(vl-catch-all-apply 'kkf:repair-support-path nil)
+(princ)
