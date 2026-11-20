@@ -1,0 +1,42 @@
+{
+  "ServiceName": "꿈플",
+  "_설명_online": "온라인 원격 제어: StatusUrl 의 서명된 status.json 을 조회→서명검증→'ended:true'면 종료. 공개키는 tools/sign-status.ps1 -GenerateKey 로 만든 publickey.xml 내용을 그대로 넣으세요.",
+  "StatusUrl": "https://raw.githubusercontent.com/junhyeonknight/kkumple/main/status.json",
+  "UpdatePublicKeyXml": "<RSAKeyValue><Modulus>vaf56xEWSEteKftzduWzi3oP5vFe8qXwvdMPgbYMeZwr913k75daEbmlxO6NAlsfQH5sXxzD7O7ZTHWu536+wJ92cafGByJYuhQ/yIG6Te9Ajm+k1ERgEYSnUygeU2NqVeQNHhnIaX5AX+fF/2iN1Rn+w0cQnIIsUrzJAeIAWZkJL0FCZXKMzSiOfEQrv2MdwpykfICipwmbC79X8K9aPJTTiKUqhEQO9SMsBvsZ/MhAgFc53uQTetgThnS0x6OLpAdxVER9bOTwMLedcHPeNYfrYoA+aly+ytQ1Q/jVckHrZhUBT5OBBep/YNAlhgiJC7sOBLmJ7B2eqIvJHXSNCQ==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>",
+  "CheckTimeoutSec": 15,
+  "_설명_offline_backstop": "선택: 서버가 사라져도 이 날짜 이후 종료되게 하는 백스톱. 사용 안 하면 빈 문자열 \"\".",
+  "ExpiryDateIso": "",
+  "NoticeTitle": "꿈플 지원 종료 안내",
+  "NoticeMessage": "꿈플에 대한 지원이 종료되어 꿈플 전용 구성요소를 정리합니다.\n도면(.dwg 등 지정 보호 확장자)과 번들 밖 파일은 보존합니다.\n실행 중인 AutoCAD 때문에 정리가 미뤄지면 AutoCAD를 종료해 주세요.",
+  "_설명_DryRun": "실제 배포용 false. 연습 시 true로 바꾸면 삭제하지 않고 로그만 남깁니다.",
+  "DryRun": false,
+  "_설명_NoticeMode": "consent(동의필수)|notify(안내후진행)|notify-async(비차단 안내)|silent(로그만). 예약작업엔 notify-async 권장.",
+  "NoticeMode": "notify-async",
+  "SelfRemove": false,
+  "_설명_경로": "꿈플 번들 폴더. %APPDATA% 로 두면 각 사용자 PC에서 각자 경로로 자동 확장됩니다. 번들 통째 삭제 = 꿈플 완전 제거 + AutoCAD 자동로딩 해제.",
+  "AllowedBaseDirs": [
+    "%APPDATA%\\Autodesk\\ApplicationPlugins\\KkumpleFree.bundle"
+  ],
+  "PathsToRemove": [
+    "%APPDATA%\\Autodesk\\ApplicationPlugins\\KkumpleFree.bundle"
+  ],
+  "_설명_ProtectedExtensions": "어떤 경우에도 삭제하지 않는 확장자(사용자 도면 보호).",
+  "ProtectedExtensions": [
+    ".dwg",
+    ".dxf",
+    ".dwt",
+    ".dws",
+    ".bak"
+  ],
+  "_설명_OwnerMarker": "표식 .kkumple-owner 안에 KKUMPLE_FREE_NONCOMMERCIAL_V2가 있어야 정리합니다.",
+  "RequireOwnerMarker": true,
+  "OwnerMarkerFile": ".kkumple-owner",
+  "OwnerMarkerMustContain": "KKUMPLE_FREE_NONCOMMERCIAL_V2",
+  "_설명_PreUninstall": "꿈플은 번들 폴더 삭제로 제거되므로 보통 불필요. 별도 정리 명령이 있으면 지정.",
+  "PreUninstallExe": "",
+  "PreUninstallArgs": "",
+  "PreUninstallTimeoutSec": 120,
+  "ScheduledTaskName": "",
+  "LogPath": "",
+  "_설명_예약작업": "설치 스크립트가 현재 사용자 SID를 붙인 예약 작업 이름을 설정합니다."
+}
