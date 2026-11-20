@@ -1,0 +1,22 @@
+{
+  "archive": "C:\\Users\\은준현\\Documents\\Codex\\2026-11-17\\1-done-service-end-serviceendagent-program-2\\outputs\\꿈플-자동점검-배포.zip",
+  "files": 12,
+  "size": 34800,
+  "sha256": "a9237e5c4e2386ab47453158be6d16015dac703946ea3ad56ae9e5e89433b41a",
+  "configArmed": true,
+  "containsPrivateKey": false,
+  "zipRoundtripVerified": true,
+  "checksums": {
+    "agent-common.ps1": "435cd4e24fcf56670ecf4f6bc5ae4e3909ec0253163d5e45c1d4b20ee65cf945",
+    "config.json": "241b24914e6ef5390ac0e3f12b2d65ff7b0fc07d3f54659545b7b31310845688",
+    "consent-config.json": "d637076ab5012b52d96275cf5593b2c91b67b150bebdea8d6f9c1bc64be0d946",
+    "install-agent.ps1": "60ec2a8456a7d4e3cb0fd3ca23911010f5541ff99fe93126ebfd716c9a9a6649",
+    "remove-agent.ps1": "076ed6fa2a5f8d218f0d0b08e74912ffc3907871aee7da5e39756fad1d5f8619",
+    "검증결과.md": "66e6285fcd518d1b04144dd890c9413dc437e8c353b7db12665c6d9819b6cb2e",
+    "꿈플-서비스종료.exe": "d160dd085818782a6139a5ec2d7c2d4e617b0a9367e11be9a5605abc0813b886",
+    "꿈플-설치.exe": "d0c2567448448e91fa8443b7ddf2a37cd04e04bac0c53327a412cdc57116d180",
+    "사용방법.md": "9364ed3b4a507a6154e24d2277420915a352b49e974e3c5cda1d6a51ccd8093d",
+    "자동점검-설치.cmd": "65fe45ed061781f62a4124ac4c487266d46aa0f53946cf9cb2cd59d8540dbcf9",
+    "자동점검-제거.cmd": "ddb316d381dbe776b5259e5599067d6e6215a3237d7fc455d08e34969753e2f1"
+  }
+}
