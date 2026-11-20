@@ -1,0 +1,26 @@
+const task = await taskSpace(2);
+const page = task.page("p1");
+const fs = await import("node:fs/promises");
+const next = (await fs.readFile("E:/꿈플-원격스위치/auto-update/releases/2.0.7/signed-with-installer/update.json", "utf8")).replace(/^\uFEFF/, "").trim();
+const live = (await (await fetch("https://raw.githubusercontent.com/junhyeonknight/kkumple/main/update.json?t=" + Date.now())).text()).trim();
+const signed207 = (await fs.readFile("E:/꿈플-원격스위치/auto-update/releases/2.0.7/signed/update.json", "utf8")).replace(/^\uFEFF/, "").trim();
+if (live !== signed207) throw new Error("live update.json is not the 2.0.7 manifest we published");
+const selector = '.cm-content[contenteditable="true"]';
+await page.goto("https://github.com/junhyeonknight/kkumple/edit/main/update.json", { timeout: 60000 });
+await page.waitForSelector(selector, { timeout: 30000 });
+await page.focus(selector);
+await page.keyboard.press("ControlOrMeta+a");
+await page.keyboard.insertText(next);
+await page.waitForFunction((want) => document.querySelector(".cm-content")?.innerText.trim() === want, next, { timeout: 15000 });
+await page.click('text="Commit changes..."', { label: "open commit dialog" });
+await page.waitForSelector("#commit-message-input", { timeout: 15000 });
+const direct = await page.evaluate(() => document.querySelector('[role=dialog] input[value=direct], dialog input[value=direct]')?.checked);
+if (!direct) throw new Error("direct commit to main not selected");
+await page.fill("#commit-message-input", "Add signed installer 2.2.5 self-update entry to update.json");
+const pos = await page.evaluate(() => {
+  const b = document.querySelector(':is([role=dialog],dialog[open]) button[data-variant=primary]');
+  const r = b.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+});
+await page.mouse.click(pos.x, pos.y, { label: "commit update.json" });
+await page.waitForURL("**/blob/main/update.json", { timeout: 40000 });
+console.log({ url: await page.url() });
